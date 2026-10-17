@@ -1,0 +1,44 @@
+{
+  "dataset": "pems-bay",
+  "batches_completed": 1,
+  "batches_total": 10,
+  "n_samples": {
+    "time_only": 1050,
+    "ots_instant": 1050,
+    "ots_cvar_fixed": 1050,
+    "sparc_ots": 1050,
+    "oracle": 1050
+  },
+  "rii_sum": {
+    "time_only": 963.0564740300179,
+    "ots_instant": 829.0436395406723,
+    "ots_cvar_fixed": 829.5709070563316,
+    "sparc_ots": 829.5709070563316,
+    "oracle": 829.0436395406723
+  },
+  "rii_sumsq": {
+    "time_only": 971.8412461310011,
+    "ots_instant": 654.5841523144329,
+    "ots_cvar_fixed": 655.4176003434604,
+    "sparc_ots": 655.4176003434604,
+    "oracle": 654.5841523144329
+  },
+  "travel_time_sum": {
+    "time_only": 60.848928550620094,
+    "ots_instant": 61.455476149538654,
+    "ots_cvar_fixed": 61.455476149538654,
+    "sparc_ots": 61.455476149538654,
+    "oracle": 61.455476149538654
+  },
+  "travel_time_sumsq": {
+    "time_only": 3.7241573862476294,
+    "ots_instant": 3.8179287443911623,
+    "ots_cvar_fixed": 3.8179287443911623,
+    "sparc_ots": 3.8179287443911623,
+    "oracle": 3.8179287443911623
+  },
+  "dqi_sum": 652.8411399326724,
+  "dqi_count": 1050,
+  "last_batch_idx": 0,
+  "timestamp": "2026-07-31T06:52:52.611608+00:00"
+}

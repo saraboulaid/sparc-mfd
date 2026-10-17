@@ -1,0 +1,64 @@
+{
+  "metr-la": {
+    "dataset": "metr-la",
+    "data_source": "real_dcrnn",
+    "synthetic": false,
+    "shape": [
+      34272,
+      207
+    ],
+    "file_size_mb": 54.4,
+    "file_hash": "64784b76d6fb8ec9bff4b6decafb354da2bb37840468fdccee5044e511277c05",
+    "resolution_minutes": 5,
+    "sampling_interval_minutes": 5.0,
+    "timestamp_min": "2012-03-01T00:00:00",
+    "timestamp_max": "2012-06-27T23:55:00",
+    "adjacency_shape": [
+      207,
+      207
+    ],
+    "adj_density": 0.040188,
+    "adj_synthetic": false,
+    "distances_source": "official_dcrnn",
+    "distances_synthetic": false,
+    "sensor_alignment_ok": true,
+    "sensor_order_alignment_ok": true,
+    "sensor_order_margin": 0.1465,
+    "h5_path": "data\\metr-la\\metr-la.h5",
+    "ok_for_full": true,
+    "messages": [
+      "Distances use DCRNN sensor IDs; index mapping via h5 axis0 is required"
+    ]
+  },
+  "pems-bay": {
+    "dataset": "pems-bay",
+    "data_source": "real_dcrnn",
+    "synthetic": false,
+    "shape": [
+      52116,
+      325
+    ],
+    "file_size_mb": 129.63,
+    "file_hash": "65d69fb0a2323dba9867179eb7af47c8b814186bc459ff0a4937d21614153c8f",
+    "resolution_minutes": 5,
+    "sampling_interval_minutes": 5.0,
+    "timestamp_min": "2017-01-01T00:00:00",
+    "timestamp_max": "2017-06-30T23:55:00",
+    "adjacency_shape": [
+      325,
+      325
+    ],
+    "adj_density": 0.025505,
+    "adj_synthetic": false,
+    "distances_source": "official_dcrnn",
+    "distances_synthetic": false,
+    "sensor_alignment_ok": true,
+    "sensor_order_alignment_ok": true,
+    "sensor_order_margin": 0.1833,
+    "h5_path": "data\\pems-bay\\pems-bay.h5",
+    "ok_for_full": true,
+    "messages": [
+      "Distances use DCRNN sensor IDs; index mapping via h5 axis0 is required"
+    ]
+  }
+}

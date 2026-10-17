@@ -1,0 +1,44 @@
+{
+  "dataset": "metr-la",
+  "batches_completed": 2,
+  "batches_total": 2,
+  "n_samples": {
+    "time_only": 220,
+    "ots_instant": 220,
+    "ots_cvar_fixed": 220,
+    "sparc_ots": 220,
+    "oracle": 220
+  },
+  "rii_sum": {
+    "time_only": 647.4812027215958,
+    "ots_instant": 273.4168734550476,
+    "ots_cvar_fixed": 273.9174588918686,
+    "sparc_ots": 273.9174588918686,
+    "oracle": 273.4168734550476
+  },
+  "rii_sumsq": {
+    "time_only": 2330.2692872289585,
+    "ots_instant": 343.4784460273734,
+    "ots_cvar_fixed": 344.23891865194594,
+    "sparc_ots": 344.23891865194594,
+    "oracle": 343.4784460273734
+  },
+  "travel_time_sum": {
+    "time_only": 64.04337182003141,
+    "ots_instant": 66.66857148730314,
+    "ots_cvar_fixed": 66.66857148730314,
+    "sparc_ots": 66.66857148730314,
+    "oracle": 66.66857148730314
+  },
+  "travel_time_sumsq": {
+    "time_only": 59.55203358140425,
+    "ots_instant": 60.875254976217356,
+    "ots_cvar_fixed": 60.875254976217356,
+    "sparc_ots": 60.875254976217356,
+    "oracle": 60.875254976217356
+  },
+  "dqi_sum": 188.92547136468968,
+  "dqi_count": 220,
+  "last_batch_idx": 1,
+  "timestamp": "2026-07-30T20:25:58.772213+00:00"
+}

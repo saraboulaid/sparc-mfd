@@ -1,0 +1,15 @@
+{
+  "dataset": "metr-la",
+  "run_mode": "quick",
+  "protocol_hash": "5a211ef772e19cfa",
+  "completed_stages": [
+    "E0",
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5"
+  ],
+  "last_stage": "E5",
+  "timestamp": "2026-07-31T05:02:49.157473+00:00"
+}

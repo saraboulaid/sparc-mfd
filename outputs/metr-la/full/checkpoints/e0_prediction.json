@@ -1,0 +1,41 @@
+{
+  "dataset": "metr-la",
+  "run_mode": "full",
+  "configuration": {
+    "dataset": "metr-la",
+    "seed": 42,
+    "quick": false,
+    "sparsity_levels": [
+      0.05,
+      0.1,
+      0.2,
+      0.5
+    ],
+    "n_od_pairs": 1000,
+    "od_batch_size": 50,
+    "seq_len": 12,
+    "epochs": 10,
+    "hidden_dim": 64,
+    "batch_size": 32
+  },
+  "seed": 42,
+  "code_version": "unknown",
+  "protocol_hash": "1f508ca13b9012dd",
+  "stage": "E0",
+  "status": "completed",
+  "completed_batches": {},
+  "partial_metrics": {},
+  "timestamp": "2026-07-31T09:47:07.681840+00:00",
+  "payload": {
+    "metrics": {
+      "mae": 0.7060955166816711,
+      "rmse": 1.0614491701126099
+    },
+    "artifacts": [
+      "encoder.pt",
+      "mu.npy",
+      "sigma.npy",
+      "emb.npy"
+    ]
+  }
+}

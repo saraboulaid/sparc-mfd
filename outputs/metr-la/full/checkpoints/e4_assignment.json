@@ -1,0 +1,51 @@
+{
+  "dataset": "metr-la",
+  "run_mode": "full",
+  "configuration": {
+    "dataset": "metr-la",
+    "seed": 42,
+    "quick": false,
+    "sparsity_levels": [
+      0.05,
+      0.1,
+      0.2,
+      0.5
+    ],
+    "n_od_pairs": 1000,
+    "od_batch_size": 50,
+    "seq_len": 12,
+    "epochs": 10,
+    "hidden_dim": 64,
+    "batch_size": 32
+  },
+  "seed": 42,
+  "code_version": "unknown",
+  "protocol_hash": "1f508ca13b9012dd",
+  "stage": "E4",
+  "status": "completed",
+  "completed_batches": {},
+  "partial_metrics": {},
+  "timestamp": "2026-08-13T08:55:05.015342+00:00",
+  "payload": {
+    "e4": {
+      "time_only": {
+        "total_flow": 142.88589705919438,
+        "travel_cost": 12.523753025266286,
+        "risk_exposure": 186.19879108696938,
+        "n_iter_effective": 20
+      },
+      "risk_cvar_fixed": {
+        "total_flow": 49.96010386685117,
+        "travel_cost": 15.456965506490349,
+        "risk_exposure": 76.6438906167962,
+        "n_iter_effective": 20
+      },
+      "sparc_mfd": {
+        "total_flow": 50.9593059441882,
+        "travel_cost": 14.823790516143236,
+        "risk_exposure": 77.58852750543798,
+        "n_iter_effective": 20
+      }
+    }
+  }
+}

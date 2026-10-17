@@ -1,0 +1,31 @@
+{
+  "stages": [
+    {
+      "stage": "E1",
+      "wall_seconds": 0.0014,
+      "peak_ram_mb": 0.01,
+      "sub_stages": {},
+      "extra": {
+        "n_sparsity_levels": 4
+      }
+    },
+    {
+      "stage": "E3",
+      "wall_seconds": 318633.2852,
+      "peak_ram_mb": 2.13,
+      "sub_stages": {},
+      "extra": {
+        "batches": 20
+      }
+    },
+    {
+      "stage": "E4",
+      "wall_seconds": 1470.3836,
+      "peak_ram_mb": 8.0,
+      "sub_stages": {},
+      "extra": {}
+    }
+  ],
+  "total_wall_seconds": 320103.6701,
+  "peak_ram_mb": 8.0
+}

@@ -1,0 +1,86 @@
+{
+  "dataset": "metr-la",
+  "run_mode": "quick",
+  "configuration": {
+    "dataset": "metr-la",
+    "seed": 42,
+    "quick": true,
+    "sparsity_levels": [
+      0.05,
+      0.1,
+      0.2,
+      0.5
+    ],
+    "n_od_pairs": 20,
+    "od_batch_size": 10,
+    "seq_len": 12,
+    "epochs": 10,
+    "hidden_dim": 64,
+    "batch_size": 32
+  },
+  "seed": 42,
+  "code_version": "unknown",
+  "protocol_hash": "5a211ef772e19cfa",
+  "stage": "E3",
+  "status": "completed",
+  "completed_batches": {
+    "E3": {
+      "done": 2,
+      "total": 2
+    }
+  },
+  "partial_metrics": {
+    "n_samples": {
+      "time_only": 220,
+      "ots_instant": 220,
+      "ots_cvar_fixed": 220,
+      "sparc_ots": 220,
+      "oracle": 220
+    }
+  },
+  "timestamp": "2026-07-31T04:54:37.555361+00:00",
+  "payload": {
+    "dataset": "metr-la",
+    "batches_completed": 2,
+    "batches_total": 2,
+    "n_samples": {
+      "time_only": 220,
+      "ots_instant": 220,
+      "ots_cvar_fixed": 220,
+      "sparc_ots": 220,
+      "oracle": 220
+    },
+    "rii_sum": {
+      "time_only": 637.6269611120224,
+      "ots_instant": 269.7614095211029,
+      "ots_cvar_fixed": 270.2298943400383,
+      "sparc_ots": 270.2298943400383,
+      "oracle": 269.7614095211029
+    },
+    "rii_sumsq": {
+      "time_only": 2254.5548513461426,
+      "ots_instant": 336.19242572129934,
+      "ots_cvar_fixed": 336.65925068271207,
+      "sparc_ots": 336.65925068271207,
+      "oracle": 336.19242572129934
+    },
+    "travel_time_sum": {
+      "time_only": 64.04337182003141,
+      "ots_instant": 66.66857148730314,
+      "ots_cvar_fixed": 66.66857148730314,
+      "sparc_ots": 66.66857148730314,
+      "oracle": 66.66857148730314
+    },
+    "travel_time_sumsq": {
+      "time_only": 59.55203358140425,
+      "ots_instant": 60.875254976217356,
+      "ots_cvar_fixed": 60.875254976217356,
+      "sparc_ots": 60.875254976217356,
+      "oracle": 60.875254976217356
+    },
+    "dqi_sum": 188.9286883128406,
+    "dqi_count": 220,
+    "last_batch_idx": 1,
+    "timestamp": "2026-07-31T04:54:37.310202+00:00"
+  }
+}

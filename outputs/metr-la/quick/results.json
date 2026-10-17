@@ -1,0 +1,123 @@
+{
+  "dataset": "metr-la",
+  "run_mode": "quick",
+  "E0_prediction": {
+    "mae": 0.5349027514457703,
+    "rmse": 0.6993415951728821
+  },
+  "E1_imputation": {
+    "sparsity_5": {
+      "mae": 0.07412507723678242
+    },
+    "sparsity_10": {
+      "mae": 0.06108074567534707
+    },
+    "sparsity_20": {
+      "mae": 0.05198352174325423
+    },
+    "sparsity_50": {
+      "mae": 0.05937923897396435
+    }
+  },
+  "E2_mfd": {
+    "regime_fractions": {
+      "free_flow": 0.9154929577464789,
+      "critical": 0.08450704225352113,
+      "congested": 0.0
+    }
+  },
+  "E3_routing": {
+    "rii": {
+      "time_only": {
+        "mean": 2.898304368691011,
+        "std": 1.3593411578608672,
+        "median": 2.5238959789276123,
+        "regret_vs_oracle": 1.407965624841092
+      },
+      "ots_instant": {
+        "mean": 1.2261882250959224,
+        "std": 0.15687519331744654,
+        "median": 1.2145320177078247,
+        "regret_vs_oracle": 0.0
+      },
+      "ots_cvar_fixed": {
+        "mean": 1.2283177015456286,
+        "std": 0.14664564553618126,
+        "median": 1.2204193472862244,
+        "regret_vs_oracle": 0.0033306437164343896
+      },
+      "sparc_ots": {
+        "mean": 1.2283177015456286,
+        "std": 0.14664564553618126,
+        "median": 1.2204193472862244,
+        "regret_vs_oracle": 0.0033306437164343896
+      },
+      "oracle": {
+        "mean": 1.2261882250959224,
+        "std": 0.15687519331744654,
+        "median": 1.2145320177078247
+      }
+    },
+    "travel_time": {
+      "time_only": {
+        "mean": 0.29110623554559734,
+        "std": 0.4312171394554338,
+        "median": 0.17712893673221428,
+        "regret_vs_oracle": -0.05296115470854784
+      },
+      "ots_instant": {
+        "mean": 0.3030389613059233,
+        "std": 0.42996871091740924,
+        "median": 0.18875095286811355,
+        "regret_vs_oracle": 0.0
+      },
+      "ots_cvar_fixed": {
+        "mean": 0.3030389613059233,
+        "std": 0.42996871091740924,
+        "median": 0.18875095286811355,
+        "regret_vs_oracle": 0.0
+      },
+      "sparc_ots": {
+        "mean": 0.3030389613059233,
+        "std": 0.42996871091740924,
+        "median": 0.18875095286811355,
+        "regret_vs_oracle": 0.0
+      },
+      "oracle": {
+        "mean": 0.3030389613059233,
+        "std": 0.42996871091740924,
+        "median": 0.18875095286811355
+      }
+    },
+    "risk_reduction_pct": 57.61943725391458,
+    "n_od_pairs": 20,
+    "od_batch_size": 10,
+    "batches_total": 2
+  },
+  "E4_assignment": {
+    "time_only": {
+      "total_flow": 45.96329555750309,
+      "travel_cost": 5.131382744139945,
+      "risk_exposure": 56.020498344190266,
+      "n_iter_effective": 20
+    },
+    "risk_cvar_fixed": {
+      "total_flow": 19.98404154674047,
+      "travel_cost": 5.31057068542831,
+      "risk_exposure": 24.579828501713298,
+      "n_iter_effective": 20
+    },
+    "sparc_mfd": {
+      "total_flow": 19.98404154674047,
+      "travel_cost": 5.31057068542831,
+      "risk_exposure": 24.579828501713298,
+      "n_iter_effective": 20
+    }
+  },
+  "E5_decision_support": {
+    "dqi_mean": 0.8587667650583664,
+    "dqi_median": 0.8587667650583664,
+    "pareto_size_mean": 3.0,
+    "dqi_count": 220
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "dataset": "metr-la",
+  "run_mode": "full",
+  "configuration": {
+    "dataset": "metr-la",
+    "seed": 42,
+    "quick": false,
+    "sparsity_levels": [
+      0.05,
+      0.1,
+      0.2,
+      0.5
+    ],
+    "n_od_pairs": 1000,
+    "od_batch_size": 50,
+    "seq_len": 12,
+    "epochs": 10,
+    "hidden_dim": 64,
+    "batch_size": 32
+  },
+  "seed": 42,
+  "code_version": "unknown",
+  "protocol_hash": "1f508ca13b9012dd",
+  "stage": "E3",
+  "status": "completed",
+  "completed_batches": {
+    "E3": {
+      "done": 20,
+      "total": 20
+    }
+  },
+  "partial_metrics": {
+    "n_samples": {
+      "time_only": 21000,
+      "ots_instant": 21000,
+      "ots_cvar_fixed": 21000,
+      "sparc_ots": 21000,
+      "oracle": 21000
+    }
+  },
+  "timestamp": "2026-08-13T08:30:40.722484+00:00",
+  "payload": {
+    "dataset": "metr-la",
+    "batches_completed": 20,
+    "batches_total": 20,
+    "n_samples": {
+      "time_only": 21000,
+      "ots_instant": 21000,
+      "ots_cvar_fixed": 21000,
+      "sparc_ots": 21000,
+      "oracle": 21000
+    },
+    "rii_sum": {
+      "time_only": 66411.11394113302,
+      "ots_instant": 24282.22813808918,
+      "ots_cvar_fixed": 24328.52171510458,
+      "sparc_ots": 24331.32668507099,
+      "oracle": 24280.67301863432
+    },
+    "rii_sumsq": {
+      "time_only": 306080.7392158766,
+      "ots_instant": 39570.785104703675,
+      "ots_cvar_fixed": 38958.4463136106,
+      "sparc_ots": 38854.587363222476,
+      "oracle": 39614.426504437615
+    },
+    "travel_time_sum": {
+      "time_only": 12244.417505807221,
+      "ots_instant": 13162.870042534048,
+      "ots_cvar_fixed": 13345.479972627823,
+      "sparc_ots": 13234.960763086161,
+      "oracle": 13259.12742417823
+    },
+    "travel_time_sumsq": {
+      "time_only": 71561.42752242777,
+      "ots_instant": 72686.3021163969,
+      "ots_cvar_fixed": 73185.28568744515,
+      "sparc_ots": 72834.79159532895,
+      "oracle": 72892.51640665605
+    },
+    "dqi_sum": 19958.30768618008,
+    "dqi_count": 21000,
+    "last_batch_idx": 19,
+    "timestamp": "2026-08-13T08:30:40.720058+00:00",
+    "last_timestep_idx": 20,
+    "timesteps_per_batch": 21
+  }
+}

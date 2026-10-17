@@ -1,0 +1,37 @@
+{
+  "dataset": "metr-la",
+  "run_mode": "full",
+  "configuration": {
+    "dataset": "metr-la",
+    "seed": 42,
+    "quick": false,
+    "sparsity_levels": [
+      0.05,
+      0.1,
+      0.2,
+      0.5
+    ],
+    "n_od_pairs": 1000,
+    "od_batch_size": 50,
+    "seq_len": 12,
+    "epochs": 10,
+    "hidden_dim": 64,
+    "batch_size": 32
+  },
+  "seed": 42,
+  "code_version": "unknown",
+  "protocol_hash": "1f508ca13b9012dd",
+  "stage": "E5",
+  "status": "completed",
+  "completed_batches": {},
+  "partial_metrics": {},
+  "timestamp": "2026-08-13T08:55:05.027491+00:00",
+  "payload": {
+    "e5": {
+      "dqi_mean": 0.9503956041038133,
+      "dqi_median": 0.9503956041038133,
+      "pareto_size_mean": 3.0,
+      "dqi_count": 21000
+    }
+  }
+}

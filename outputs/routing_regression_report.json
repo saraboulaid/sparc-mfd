@@ -1,0 +1,206 @@
+{
+  "dataset": "metr-la",
+  "n_od_pairs": 5,
+  "timesteps": [
+    0,
+    25
+  ],
+  "legacy_keys": 50,
+  "variants": {
+    "csv_direct_python": {
+      "topology": "csv_direct",
+      "backend": "python",
+      "matches": 50,
+      "total": 50,
+      "match_rate": 1.0,
+      "sample_mismatches": [],
+      "mean_degree": 206.0
+    },
+    "csv_direct_scipy": {
+      "topology": "csv_direct",
+      "backend": "scipy",
+      "matches": 50,
+      "total": 50,
+      "match_rate": 1.0,
+      "sample_mismatches": [],
+      "mean_degree": 206.0
+    },
+    "adj_mx_python": {
+      "topology": "adj_mx",
+      "backend": "python",
+      "matches": 0,
+      "total": 50,
+      "match_rate": 0.0,
+      "sample_mismatches": [
+        {
+          "key": "t0_o18_d160_time_only",
+          "legacy": {
+            "cost": 0.32427294353152564,
+            "rii": 2.535629153251648,
+            "travel_time": 0.32427294353152564,
+            "cvar": 1.8740177154541016
+          },
+          "candidate": {
+            "cost": 0.4011728931000667,
+            "rii": 21.824797689914703,
+            "travel_time": 0.4011728931000667,
+            "cvar": 1.7232598066329956
+          }
+        },
+        {
+          "key": "t0_o18_d160_ots_instant",
+          "legacy": {
+            "cost": 1.4565039896826524,
+            "rii": 0.6616114377975464,
+            "travel_time": 0.7948925518851059,
+            "cvar": 0.6616114377975464
+          },
+          "candidate": {
+            "cost": 12.976923326278417,
+            "rii": 12.382700681686401,
+            "travel_time": 0.5942226445920149,
+            "cvar": 1.5772648453712463
+          }
+        },
+        {
+          "key": "t0_o18_d160_ots_cvar_fixed",
+          "legacy": {
+            "cost": 7.031521561131932,
+            "rii": 0.6616114377975464,
+            "travel_time": 0.7948925518851059,
+            "cvar": 0.6616114377975464
+          },
+          "candidate": {
+            "cost": 61.84174012549552,
+            "rii": 12.943607807159424,
+            "travel_time": 0.8716340006175862,
+            "cvar": 1.8172635436058044
+          }
+        },
+        {
+          "key": "t0_o18_d160_sparc_ots",
+          "legacy": {
+            "cost": 3.037570167554789,
+            "rii": 0.6616114377975464,
+            "travel_time": 0.7948925518851059,
+            "cvar": 0.6616114377975464
+          },
+          "candidate": {
+            "cost": 26.086051180652465,
+            "rii": 12.943607807159424,
+            "travel_time": 0.8716340006175862,
+            "cvar": 1.8172635436058044
+          }
+        },
+        {
+          "key": "t0_o18_d160_oracle",
+          "legacy": {
+            "cost": 3.0056693450627434,
+            "rii": 0.6616114377975464,
+            "travel_time": 0.7948925518851059,
+            "cvar": 0.6616114377975464
+          },
+          "candidate": {
+            "cost": 25.731135297924002,
+            "rii": 12.943607807159424,
+            "travel_time": 0.8716340006175862,
+            "cvar": 1.8172635436058044
+          }
+        }
+      ],
+      "mean_degree": 7.318840579710145
+    },
+    "adj_mx_scipy": {
+      "topology": "adj_mx",
+      "backend": "scipy",
+      "matches": 0,
+      "total": 50,
+      "match_rate": 0.0,
+      "sample_mismatches": [
+        {
+          "key": "t0_o18_d160_time_only",
+          "legacy": {
+            "cost": 0.32427294353152564,
+            "rii": 2.535629153251648,
+            "travel_time": 0.32427294353152564,
+            "cvar": 1.8740177154541016
+          },
+          "candidate": {
+            "cost": 0.4011728931000667,
+            "rii": 21.824797689914703,
+            "travel_time": 0.4011728931000667,
+            "cvar": 1.7232598066329956
+          }
+        },
+        {
+          "key": "t0_o18_d160_ots_instant",
+          "legacy": {
+            "cost": 1.4565039896826524,
+            "rii": 0.6616114377975464,
+            "travel_time": 0.7948925518851059,
+            "cvar": 0.6616114377975464
+          },
+          "candidate": {
+            "cost": 12.976923326278417,
+            "rii": 12.382700681686401,
+            "travel_time": 0.5942226445920149,
+            "cvar": 1.5772648453712463
+          }
+        },
+        {
+          "key": "t0_o18_d160_ots_cvar_fixed",
+          "legacy": {
+            "cost": 7.031521561131932,
+            "rii": 0.6616114377975464,
+            "travel_time": 0.7948925518851059,
+            "cvar": 0.6616114377975464
+          },
+          "candidate": {
+            "cost": 61.84174012549552,
+            "rii": 12.943607807159424,
+            "travel_time": 0.8716340006175862,
+            "cvar": 1.8172635436058044
+          }
+        },
+        {
+          "key": "t0_o18_d160_sparc_ots",
+          "legacy": {
+            "cost": 3.037570167554789,
+            "rii": 0.6616114377975464,
+            "travel_time": 0.7948925518851059,
+            "cvar": 0.6616114377975464
+          },
+          "candidate": {
+            "cost": 26.086051180652465,
+            "rii": 12.943607807159424,
+            "travel_time": 0.8716340006175862,
+            "cvar": 1.8172635436058044
+          }
+        },
+        {
+          "key": "t0_o18_d160_oracle",
+          "legacy": {
+            "cost": 3.0056693450627434,
+            "rii": 0.6616114377975464,
+            "travel_time": 0.7948925518851059,
+            "cvar": 0.6616114377975464
+          },
+          "candidate": {
+            "cost": 25.731135297924002,
+            "rii": 12.943607807159424,
+            "travel_time": 0.8716340006175862,
+            "cvar": 1.8172635436058044
+          }
+        }
+      ],
+      "mean_degree": 7.318840579710145
+    }
+  },
+  "elapsed_s": 453.7120260000229,
+  "topology_scores": {
+    "csv_direct": 1.0,
+    "adj_mx": 0.0
+  },
+  "selected_topology": "csv_direct",
+  "selected_backend": "scipy"
+}

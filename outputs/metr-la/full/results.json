@@ -1,0 +1,150 @@
+{
+  "dataset": "metr-la",
+  "run_mode": "full",
+  "data_provenance": {
+    "dataset": "metr-la",
+    "data_source": "real_dcrnn",
+    "synthetic": false,
+    "shape": [
+      34272,
+      207
+    ],
+    "file_size_mb": 54.4,
+    "file_hash": "64784b76d6fb8ec9bff4b6decafb354da2bb37840468fdccee5044e511277c05",
+    "resolution_minutes": 5,
+    "sampling_interval_minutes": 5.0,
+    "timestamp_min": "2012-03-01T00:00:00",
+    "timestamp_max": "2012-06-27T23:55:00",
+    "adjacency_shape": [
+      207,
+      207
+    ],
+    "adj_density": 0.040188,
+    "adj_synthetic": false,
+    "distances_source": "official_dcrnn",
+    "distances_synthetic": false,
+    "sensor_alignment_ok": true,
+    "sensor_order_alignment_ok": true,
+    "sensor_order_margin": 0.1465,
+    "h5_path": "data/metr-la/metr-la.h5"
+  },
+  "E0_prediction": {
+    "mae": 0.7060955166816711,
+    "rmse": 1.0614491701126099
+  },
+  "E1_imputation": {
+    "sparsity_5": {
+      "mae": 0.1203344442571203
+    },
+    "sparsity_10": {
+      "mae": 0.13330689671316318
+    },
+    "sparsity_20": {
+      "mae": 0.10722238969589983
+    },
+    "sparsity_50": {
+      "mae": 0.12624979841833314
+    }
+  },
+  "E2_mfd": {
+    "regime_fractions": {
+      "free_flow": 0.8260105448154658,
+      "critical": 0.07205623901581722,
+      "congested": 0.10193321616871705
+    }
+  },
+  "E3_routing": {
+    "rii": {
+      "time_only": {
+        "mean": 3.105717111301422,
+        "std": 2.1006803436469466,
+        "median": 2.6104290783405304,
+        "regret_vs_oracle": 1.8197946831040135
+      },
+      "ots_instant": {
+        "mean": 1.1544931151032447,
+        "std": 0.7626292719885361,
+        "median": 0.9043190479278564,
+        "regret_vs_oracle": 0.0013690537790567725
+      },
+      "ots_cvar_fixed": {
+        "mean": 1.1574688217043876,
+        "std": 0.7307913875037307,
+        "median": 0.9059021472930908,
+        "regret_vs_oracle": 0.009801663217954759
+      },
+      "sparc_ots": {
+        "mean": 1.1568553669929504,
+        "std": 0.727008777975301,
+        "median": 0.9062096178531647,
+        "regret_vs_oracle": 0.00925784209146069
+      },
+      "oracle": {
+        "mean": 1.1545178390860558,
+        "std": 0.7645502844214808,
+        "median": 0.904161274433136
+      }
+    },
+    "travel_time": {
+      "time_only": {
+        "mean": 0.6651546633497417,
+        "std": 2.024382400175518,
+        "median": 0.18605847731788683,
+        "regret_vs_oracle": -0.09587971541685003
+      },
+      "ots_instant": {
+        "mean": 0.7080999233723698,
+        "std": 2.025010233688427,
+        "median": 0.21020767444799504,
+        "regret_vs_oracle": -0.0008960863506383786
+      },
+      "ots_cvar_fixed": {
+        "mean": 0.7155948979434237,
+        "std": 2.02741903207984,
+        "median": 0.2103108793592008,
+        "regret_vs_oracle": 0.006604272230742848
+      },
+      "sparc_ots": {
+        "mean": 0.7104261081429682,
+        "std": 2.02529252805999,
+        "median": 0.2103108793592008,
+        "regret_vs_oracle": -0.0006591866659173568
+      },
+      "oracle": {
+        "mean": 0.7118262884468657,
+        "std": 2.0256690926501735,
+        "median": 0.2103108793592008
+      }
+    },
+    "risk_reduction_pct": 63.362568038478706,
+    "n_od_pairs": 1000,
+    "od_batch_size": 50,
+    "batches_total": 20
+  },
+  "E4_assignment": {
+    "time_only": {
+      "total_flow": 142.88589705919438,
+      "travel_cost": 12.523753025266286,
+      "risk_exposure": 186.19879108696938,
+      "n_iter_effective": 20
+    },
+    "risk_cvar_fixed": {
+      "total_flow": 49.96010386685117,
+      "travel_cost": 15.456965506490349,
+      "risk_exposure": 76.6438906167962,
+      "n_iter_effective": 20
+    },
+    "sparc_mfd": {
+      "total_flow": 50.9593059441882,
+      "travel_cost": 14.823790516143236,
+      "risk_exposure": 77.58852750543798,
+      "n_iter_effective": 20
+    }
+  },
+  "E5_decision_support": {
+    "dqi_mean": 0.9503956041038133,
+    "dqi_median": 0.9503956041038133,
+    "pareto_size_mean": 3.0,
+    "dqi_count": 21000
+  }
+}

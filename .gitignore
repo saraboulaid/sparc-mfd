@@ -1,0 +1,35 @@
+# --- Data archives -----------------------------------------------------------
+# Public DCRNN releases (~190 MB); fetch with scripts/download_dcrnn_data.py
+data/
+
+# --- Large run artifacts (regenerable by re-running the pipeline) ------------
+outputs/**/*.npy
+outputs/**/*.pt
+*.npy
+*.pt
+
+# --- Scratch / throwaway runs ------------------------------------------------
+outputs/_test_ckpt/
+outputs/metr-la-test/
+outputs/pems-bay-batch-val/
+outputs_quick/
+
+# --- Manuscript (tracked outside this repository) ---------------------------
+latex/
+*.zip
+MANUSCRIPT_DRAFT.md
+
+# --- Python ------------------------------------------------------------------
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# --- Editors / OS ------------------------------------------------------------
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini

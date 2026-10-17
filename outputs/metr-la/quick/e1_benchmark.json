@@ -1,0 +1,45 @@
+{
+  "dataset": "metr-la",
+  "quick": true,
+  "n_timesteps": 11,
+  "n_sensors": 207,
+  "legacy": {
+    "wall_seconds": 7.3365,
+    "peak_ram_mb": 0.82,
+    "e1_mae": {
+      "sparsity_5": 0.0564473687925122,
+      "sparsity_10": 0.04676300253380428,
+      "sparsity_20": 0.03987534208731218,
+      "sparsity_50": 0.045537413182583725
+    }
+  },
+  "kriging_solver": {
+    "wall_seconds": 0.7627,
+    "peak_ram_mb": 0.92,
+    "e1_mae": {
+      "sparsity_5": 0.0564473687925122,
+      "sparsity_10": 0.04676300253380428,
+      "sparsity_20": 0.03987534208731218,
+      "sparsity_50": 0.045537413182583725
+    }
+  },
+  "kriging_only": {
+    "legacy_wall_seconds": 5.7886,
+    "solver_wall_seconds": 0.8239,
+    "kriging_speedup": 7.03,
+    "legacy_peak_ram_mb": 0.81,
+    "solver_peak_ram_mb": 0.92
+  },
+  "speedup_full_e1": 9.62,
+  "ram_reduction_pct": -12.3,
+  "equivalence": {
+    "max_mae_difference": 0.0,
+    "per_sparsity_mae_diff": {
+      "sparsity_5": 0.0,
+      "sparsity_10": 0.0,
+      "sparsity_20": 0.0,
+      "sparsity_50": 0.0
+    },
+    "passed": true
+  }
+}
