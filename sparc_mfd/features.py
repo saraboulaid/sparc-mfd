@@ -8,16 +8,32 @@ import numpy as np
 
 
 def aggregate_hourly(data: np.ndarray, steps_per_hour: int = 12) -> np.ndarray:
+    """Average `steps_per_hour` raw 5-minute steps into one analysis step.
+
+    The default of 12 gives hourly steps; 3 gives 15-minute steps. The resulting
+    step duration is what the OTS horizon `h` counts, so changing this changes
+    the meaning of `h` and must be reported alongside it.
+    """
+    if steps_per_hour <= 1:
+        return data.astype(np.float32)
     t = data.shape[0] // steps_per_hour * steps_per_hour
     trimmed = data[:t]
     return trimmed.reshape(-1, steps_per_hour, *trimmed.shape[1:]).mean(axis=1).astype(np.float32)
 
 
-def build_temporal_features(speed_h: np.ndarray, start: str = "2012-03-01") -> np.ndarray:
+def step_frequency(steps_per_hour: int = 12) -> str:
+    """Pandas offset alias for one analysis step of `steps_per_hour` raw steps."""
+    minutes = max(1, int(round(5 * steps_per_hour)))
+    return "1h" if minutes == 60 else f"{minutes}min"
+
+
+def build_temporal_features(
+    speed_h: np.ndarray, start: str = "2012-03-01", freq: str = "1h"
+) -> np.ndarray:
     import pandas as pd
 
     t, n = speed_h.shape
-    ts = pd.date_range(start, periods=t, freq="1h")
+    ts = pd.date_range(start, periods=t, freq=freq)
     hour = ts.hour.values
     day = ts.dayofweek.values
     feats = [

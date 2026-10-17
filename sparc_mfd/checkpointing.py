@@ -200,17 +200,44 @@ class PipelineCheckpoints:
         print("  [CKPT] E0 artifacts loaded")
         return mu, sigma, emb, payload.get("metrics", {})
 
-    def save_od_pairs(self, od_pairs: List[tuple]) -> None:
+    def save_od_pairs(self, od_pairs: List[tuple], meta: Optional[Dict] = None) -> None:
+        payload = {"od_pairs": [list(p) for p in od_pairs], "meta": meta or {}}
         with open(self.dir / "od_pairs.json", "w", encoding="utf-8") as f:
-            json.dump(od_pairs, f)
+            json.dump(payload, f)
 
-    def load_od_pairs(self) -> Optional[List[tuple]]:
+    def _read_od_pairs_payload(self) -> Optional[Dict]:
         p = self.dir / "od_pairs.json"
         if not p.exists():
             return None
         with open(p, encoding="utf-8") as f:
             raw = json.load(f)
-        return [(int(o), int(d)) for o, d in raw]
+        # Pre-topology checkpoints stored a bare list of pairs.
+        if isinstance(raw, list):
+            return {"od_pairs": raw, "meta": {}}
+        return raw
+
+    def load_od_pairs(self, topology: Optional[str] = None) -> Optional[List[tuple]]:
+        """Cached OD pairs, or None when they were drawn on another topology.
+
+        Pairs sampled on a different graph may be unreachable on this one, which
+        would silently poison the routing means, so a mismatch invalidates them.
+        """
+        payload = self._read_od_pairs_payload()
+        if payload is None:
+            return None
+        if topology is not None:
+            cached = payload.get("meta", {}).get("topology")
+            if cached != topology:
+                print(
+                    f"  [CKPT] OD pairs were drawn on topology '{cached}', "
+                    f"now running '{topology}' - resampling"
+                )
+                return None
+        return [(int(o), int(d)) for o, d in payload.get("od_pairs", [])]
+
+    def load_od_pairs_meta(self) -> Dict:
+        payload = self._read_od_pairs_payload()
+        return (payload or {}).get("meta", {})
 
     def save_e3_progress(
         self,

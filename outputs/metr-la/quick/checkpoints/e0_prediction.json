@@ -19,17 +19,66 @@
     "batch_size": 32
   },
   "seed": 42,
-  "code_version": "unknown",
+  "code_version": "e749494",
   "protocol_hash": "5a211ef772e19cfa",
   "stage": "E0",
   "status": "completed",
   "completed_batches": {},
   "partial_metrics": {},
-  "timestamp": "2026-07-31T00:44:32.040660+00:00",
+  "timestamp": "2026-10-17T19:24:00.813570+00:00",
   "payload": {
     "metrics": {
-      "mae": 0.5349027514457703,
-      "rmse": 0.6993415951728821
+      "mae": 0.8161098957061768,
+      "rmse": 1.2526321411132812,
+      "calibration": {
+        "levels": [
+          {
+            "nominal": 0.5,
+            "picp": 0.689072276983945,
+            "gap": 0.18907227698394502,
+            "mpiw": 1.4434766148270524,
+            "interval_score": 2.9292436499622005
+          },
+          {
+            "nominal": 0.8,
+            "picp": 0.8022295237852661,
+            "gap": 0.0022295237852660854,
+            "mpiw": 2.74271257162691,
+            "interval_score": 4.809991608497343
+          },
+          {
+            "nominal": 0.9,
+            "picp": 0.8789808376421046,
+            "gap": -0.02101916235789547,
+            "mpiw": 3.5201996793610357,
+            "interval_score": 6.448004303890319
+          },
+          {
+            "nominal": 0.95,
+            "picp": 0.902778839051476,
+            "gap": -0.04722116094852391,
+            "mpiw": 4.194535455983726,
+            "interval_score": 8.579884754326017
+          }
+        ],
+        "ace": 0.06488553101890762,
+        "nll": 1.6694741511704525,
+        "sigma_mean": 1.0700345550978891,
+        "sigma_std": 0.03800881099943099,
+        "n": 117783
+      },
+      "ots_components": {
+        "horizon": 3,
+        "lookback": 3,
+        "steps_per_hour": 12,
+        "step_minutes": 60,
+        "V_std_train": 5.812283515930176,
+        "D_std_train": 13.794614791870117,
+        "P_std_train": 0.3331969678401947,
+        "V_degenerate": false,
+        "D_degenerate": false,
+        "P_degenerate": false
+      }
     },
     "artifacts": [
       "encoder.pt",

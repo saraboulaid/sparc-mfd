@@ -69,6 +69,36 @@ class RoutingTopology:
         return cls(neighbors=neighbors, n_nodes=n, source=source)
 
     @classmethod
+    def from_adjacency_distances(
+        cls,
+        adj: np.ndarray,
+        dist_direct: np.ndarray,
+        fallback_m: float = 500.0,
+        source: str = "adj_real",
+    ) -> "RoutingTopology":
+        """Adjacency support with real road distances.
+
+        Keeps only the detector pairs the DCRNN adjacency declares adjacent, and
+        weights each one with its measured road distance instead of a kernel
+        proxy. This is the only topology that is simultaneously sparse (mean
+        out-degree around 7) and metrically real, so it is the one to use for
+        any routing claim.
+        """
+        n = int(adj.shape[0])
+        neighbors: List[List[Tuple[int, float]]] = [[] for _ in range(n)]
+        for u in range(n):
+            for v in range(n):
+                if u == v or float(adj[u, v]) <= 0:
+                    continue
+                d = float(dist_direct[u, v])
+                if not np.isfinite(d) or d <= 0:
+                    # Adjacency without a measured distance: fall back to the
+                    # kernel proxy rather than dropping the arc.
+                    d = fallback_m / max(float(adj[u, v]), 1e-3)
+                neighbors[u].append((v, d))
+        return cls(neighbors=neighbors, n_nodes=n, source=source)
+
+    @classmethod
     def from_dense_distances(cls, dist_matrix: np.ndarray, source: str = "legacy_dense") -> "RoutingTopology":
         n = int(dist_matrix.shape[0])
         neighbors: List[List[Tuple[int, float]]] = [[] for _ in range(n)]
@@ -85,6 +115,36 @@ class RoutingTopology:
         if self.n_nodes == 0:
             return 0.0
         return float(np.mean([len(nbrs) for nbrs in self.neighbors]))
+
+    def reachable_from(self, origin: int) -> np.ndarray:
+        """Boolean mask of nodes reachable from `origin` by a directed path."""
+        seen = np.zeros(self.n_nodes, dtype=bool)
+        seen[origin] = True
+        stack = [origin]
+        while stack:
+            u = stack.pop()
+            for v, _ in self.neighbors[u]:
+                if not seen[v]:
+                    seen[v] = True
+                    stack.append(v)
+        return seen
+
+    def connectivity_report(self) -> Dict[str, float]:
+        """Degree and reachability summary, for the experimental protocol table."""
+        degrees = np.array([len(nbrs) for nbrs in self.neighbors], dtype=np.int32)
+        n = self.n_nodes
+        reachable = sum(int(self.reachable_from(s).sum()) - 1 for s in range(n))
+        total = n * (n - 1)
+        return {
+            "source": self.source,
+            "n_nodes": n,
+            "n_edges": int(degrees.sum()),
+            "mean_out_degree": float(degrees.mean()) if n else 0.0,
+            "min_out_degree": int(degrees.min()) if n else 0,
+            "max_out_degree": int(degrees.max()) if n else 0,
+            "isolated_nodes": int((degrees == 0).sum()),
+            "reachable_od_fraction": float(reachable / total) if total else 0.0,
+        }
 
 
 def travel_time_hours(dist_m: float, speed_kmh: float, min_speed: float = 5.0) -> float:
@@ -378,18 +438,66 @@ def dijkstra(
     )
 
 
-def sample_od_pairs(dist_matrix, n_pairs, min_dist_m=5000.0, seed=42):
+def sample_od_pairs(
+    dist_matrix,
+    n_pairs,
+    min_dist_m=5000.0,
+    seed=42,
+    topology: Optional[RoutingTopology] = None,
+    stats: Optional[Dict] = None,
+):
+    """Sample origin-destination pairs at least `min_dist_m` apart.
+
+    When `topology` is given, only pairs connected by a directed path in that
+    topology are kept. A sparse road graph is not strongly connected, so without
+    this filter a fraction of the pairs would return an infinite cost and silently
+    bias the reported means. Rejection counts land in `stats` when provided.
+    """
     rng = np.random.default_rng(seed)
     n = dist_matrix.shape[0]
+    reach_cache: Dict[int, np.ndarray] = {}
+
+    def reachable(o: int, d: int) -> bool:
+        if topology is None:
+            return True
+        mask = reach_cache.get(o)
+        if mask is None:
+            mask = topology.reachable_from(o)
+            reach_cache[o] = mask
+        return bool(mask[d])
+
     pairs = []
     attempts = 0
-    while len(pairs) < n_pairs and attempts < n_pairs * 50:
+    rejected_distance = 0
+    rejected_unreachable = 0
+    while len(pairs) < n_pairs and attempts < n_pairs * 200:
         o, d = rng.integers(0, n, size=2)
         attempts += 1
-        if o != d and float(dist_matrix[o, d]) >= min_dist_m:
-            pairs.append((int(o), int(d)))
-    while len(pairs) < n_pairs:
+        if o == d:
+            continue
+        if float(dist_matrix[o, d]) < min_dist_m:
+            rejected_distance += 1
+            continue
+        if not reachable(int(o), int(d)):
+            rejected_unreachable += 1
+            continue
+        pairs.append((int(o), int(d)))
+    # Last resort: drop the distance floor but never the reachability guard.
+    while len(pairs) < n_pairs and attempts < n_pairs * 400:
         o, d = rng.integers(0, n, size=2)
-        if o != d:
+        attempts += 1
+        if o != d and reachable(int(o), int(d)):
             pairs.append((int(o), int(d)))
+    if stats is not None:
+        stats.update(
+            {
+                "requested": int(n_pairs),
+                "sampled": len(pairs),
+                "attempts": attempts,
+                "rejected_below_min_distance": rejected_distance,
+                "rejected_unreachable": rejected_unreachable,
+                "topology": topology.source if topology is not None else "none",
+                "min_dist_m": float(min_dist_m),
+            }
+        )
     return pairs[:n_pairs]

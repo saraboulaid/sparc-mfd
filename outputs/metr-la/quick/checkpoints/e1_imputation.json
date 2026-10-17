@@ -19,26 +19,26 @@
     "batch_size": 32
   },
   "seed": 42,
-  "code_version": "unknown",
+  "code_version": "e749494",
   "protocol_hash": "5a211ef772e19cfa",
   "stage": "E1",
   "status": "completed",
   "completed_batches": {},
   "partial_metrics": {},
-  "timestamp": "2026-07-31T00:44:34.833714+00:00",
+  "timestamp": "2026-10-17T19:24:08.152152+00:00",
   "payload": {
     "e1": {
       "sparsity_5": {
-        "mae": 0.07412507723678242
+        "mae": 0.09015698663213036
       },
       "sparsity_10": {
-        "mae": 0.06108074567534707
+        "mae": 0.1041765080934221
       },
       "sparsity_20": {
-        "mae": 0.05198352174325423
+        "mae": 0.08234725994142619
       },
       "sparsity_50": {
-        "mae": 0.05937923897396435
+        "mae": 0.08628383583643219
       }
     }
   }

@@ -19,7 +19,7 @@
     "batch_size": 32
   },
   "seed": 42,
-  "code_version": "unknown",
+  "code_version": "e749494",
   "protocol_hash": "5a211ef772e19cfa",
   "stage": "E3",
   "status": "completed",
@@ -38,7 +38,7 @@
       "oracle": 220
     }
   },
-  "timestamp": "2026-07-31T04:54:37.555361+00:00",
+  "timestamp": "2026-10-17T19:39:16.724124+00:00",
   "payload": {
     "dataset": "metr-la",
     "batches_completed": 2,
@@ -51,36 +51,38 @@
       "oracle": 220
     },
     "rii_sum": {
-      "time_only": 637.6269611120224,
-      "ots_instant": 269.7614095211029,
-      "ots_cvar_fixed": 270.2298943400383,
-      "sparc_ots": 270.2298943400383,
-      "oracle": 269.7614095211029
+      "time_only": 2415.1372404694557,
+      "ots_instant": 1801.8657518029213,
+      "ots_cvar_fixed": 1890.4367325901985,
+      "sparc_ots": 1828.4663916826248,
+      "oracle": 1822.7018738985062
     },
     "rii_sumsq": {
-      "time_only": 2254.5548513461426,
-      "ots_instant": 336.19242572129934,
-      "ots_cvar_fixed": 336.65925068271207,
-      "sparc_ots": 336.65925068271207,
-      "oracle": 336.19242572129934
+      "time_only": 28953.825176232684,
+      "ots_instant": 16032.204089851522,
+      "ots_cvar_fixed": 17728.49929194705,
+      "sparc_ots": 16485.957342474867,
+      "oracle": 16396.991071567525
     },
     "travel_time_sum": {
-      "time_only": 64.04337182003141,
-      "ots_instant": 66.66857148730314,
-      "ots_cvar_fixed": 66.66857148730314,
-      "sparc_ots": 66.66857148730314,
-      "oracle": 66.66857148730314
+      "time_only": 95.59947665585324,
+      "ots_instant": 109.24614895839814,
+      "ots_cvar_fixed": 111.41026063732016,
+      "sparc_ots": 108.80335410406812,
+      "oracle": 109.51230446400363
     },
     "travel_time_sumsq": {
-      "time_only": 59.55203358140425,
-      "ots_instant": 60.875254976217356,
-      "ots_cvar_fixed": 60.875254976217356,
-      "sparc_ots": 60.875254976217356,
-      "oracle": 60.875254976217356
+      "time_only": 141.38582119120647,
+      "ots_instant": 155.99320410811058,
+      "ots_cvar_fixed": 158.12076302652386,
+      "sparc_ots": 154.46791873734716,
+      "oracle": 155.14085211340512
     },
-    "dqi_sum": 188.9286883128406,
+    "dqi_sum": 209.59048401057672,
     "dqi_count": 220,
     "last_batch_idx": 1,
-    "timestamp": "2026-07-31T04:54:37.310202+00:00"
+    "timestamp": "2026-10-17T19:39:16.507207+00:00",
+    "last_timestep_idx": 10,
+    "timesteps_per_batch": 11
   }
 }

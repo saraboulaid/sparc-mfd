@@ -19,31 +19,31 @@
     "batch_size": 32
   },
   "seed": 42,
-  "code_version": "unknown",
+  "code_version": "e749494",
   "protocol_hash": "5a211ef772e19cfa",
   "stage": "E4",
   "status": "completed",
   "completed_batches": {},
   "partial_metrics": {},
-  "timestamp": "2026-07-31T05:02:48.851192+00:00",
+  "timestamp": "2026-10-17T19:49:12.636905+00:00",
   "payload": {
     "e4": {
       "time_only": {
-        "total_flow": 45.96329555750309,
-        "travel_cost": 5.131382744139945,
-        "risk_exposure": 56.020498344190266,
+        "total_flow": 56.95451840821034,
+        "travel_cost": 3.682210445779256,
+        "risk_exposure": 68.3914169902108,
         "n_iter_effective": 20
       },
       "risk_cvar_fixed": {
         "total_flow": 19.98404154674047,
-        "travel_cost": 5.31057068542831,
-        "risk_exposure": 24.579828501713298,
+        "travel_cost": 4.699861719033085,
+        "risk_exposure": 25.829833622794325,
         "n_iter_effective": 20
       },
       "sparc_mfd": {
         "total_flow": 19.98404154674047,
-        "travel_cost": 5.31057068542831,
-        "risk_exposure": 24.579828501713298,
+        "travel_cost": 4.699861719033085,
+        "risk_exposure": 25.829833622794325,
         "n_iter_effective": 20
       }
     }

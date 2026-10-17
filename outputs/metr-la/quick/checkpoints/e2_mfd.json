@@ -19,19 +19,19 @@
     "batch_size": 32
   },
   "seed": 42,
-  "code_version": "unknown",
+  "code_version": "e749494",
   "protocol_hash": "5a211ef772e19cfa",
   "stage": "E2",
   "status": "completed",
   "completed_batches": {},
   "partial_metrics": {},
-  "timestamp": "2026-07-31T00:44:35.140404+00:00",
+  "timestamp": "2026-10-17T19:24:09.169319+00:00",
   "payload": {
     "e2": {
       "regime_fractions": {
-        "free_flow": 0.9154929577464789,
-        "critical": 0.08450704225352113,
-        "congested": 0.0
+        "free_flow": 0.8260105448154658,
+        "critical": 0.07205623901581722,
+        "congested": 0.10193321616871705
       }
     }
   }

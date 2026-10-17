@@ -45,9 +45,31 @@ def main() -> None:
     )
     p.add_argument(
         "--routing-topology",
-        choices=["auto", "csv_direct", "adj_mx", "legacy_dense"],
+        choices=["auto", "csv_direct", "adj_mx", "adj_real", "legacy_dense"],
         default="auto",
-        help="E3 sparse graph source (default: auto from regression report)",
+        help=(
+            "E3 graph source (default: auto, which now resolves to adj_real). "
+            "adj_real = adjacency support with measured road distances; "
+            "legacy_dense is a near-complete graph kept only for regression tests"
+        ),
+    )
+    p.add_argument(
+        "--steps-per-hour",
+        type=int,
+        default=12,
+        help="Raw 5-min steps averaged into one analysis step (12=hourly, 3=15 min)",
+    )
+    p.add_argument(
+        "--ots-horizon",
+        type=int,
+        default=3,
+        help="Future steps in the OTS volatility/persistence terms (1 makes volatility zero)",
+    )
+    p.add_argument(
+        "--ots-lookback",
+        type=int,
+        default=3,
+        help="Past steps used by the OTS drop term",
     )
     p.add_argument(
         "--od-workers",
@@ -108,6 +130,9 @@ def main() -> None:
         routing_backend=args.routing_backend,
         routing_topology=args.routing_topology,
         od_workers=args.od_workers,
+        steps_per_hour=args.steps_per_hour,
+        ots_horizon=args.ots_horizon,
+        ots_lookback=args.ots_lookback,
     )
     if args.n_od_pairs is not None:
         base_kwargs["n_od_pairs"] = args.n_od_pairs

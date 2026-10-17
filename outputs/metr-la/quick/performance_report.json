@@ -2,22 +2,22 @@
   "stages": [
     {
       "stage": "E0",
-      "wall_seconds": 72.473,
-      "peak_ram_mb": 105.64,
+      "wall_seconds": 488.8564,
+      "peak_ram_mb": 271.7,
       "sub_stages": {},
       "extra": {
-        "mae": 0.5349027514457703
+        "mae": 0.8161098957061768
       }
     },
     {
       "stage": "E1",
-      "wall_seconds": 2.6857,
-      "peak_ram_mb": 0.94,
+      "wall_seconds": 7.1738,
+      "peak_ram_mb": 0.96,
       "sub_stages": {
-        "sparsity_5": 0.6985,
-        "sparsity_10": 0.5581,
-        "sparsity_20": 0.498,
-        "sparsity_50": 0.6928
+        "sparsity_5": 1.0163,
+        "sparsity_10": 2.2924,
+        "sparsity_20": 2.2496,
+        "sparsity_50": 1.0917
       },
       "extra": {
         "n_sparsity_levels": 4
@@ -25,15 +25,15 @@
     },
     {
       "stage": "E2",
-      "wall_seconds": 0.3078,
+      "wall_seconds": 1.0202,
       "peak_ram_mb": 0.11,
       "sub_stages": {},
       "extra": {}
     },
     {
       "stage": "E3",
-      "wall_seconds": 15002.4047,
-      "peak_ram_mb": 0.6,
+      "wall_seconds": 907.4776,
+      "peak_ram_mb": 11.47,
       "sub_stages": {},
       "extra": {
         "batches": 2
@@ -41,12 +41,12 @@
     },
     {
       "stage": "E4",
-      "wall_seconds": 491.287,
-      "peak_ram_mb": 1.64,
+      "wall_seconds": 595.9016,
+      "peak_ram_mb": 8.0,
       "sub_stages": {},
       "extra": {}
     }
   ],
-  "total_wall_seconds": 15569.1584,
-  "peak_ram_mb": 105.64
+  "total_wall_seconds": 2000.4296,
+  "peak_ram_mb": 271.7
 }

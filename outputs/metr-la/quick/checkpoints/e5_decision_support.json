@@ -19,17 +19,17 @@
     "batch_size": 32
   },
   "seed": 42,
-  "code_version": "unknown",
+  "code_version": "e749494",
   "protocol_hash": "5a211ef772e19cfa",
   "stage": "E5",
   "status": "completed",
   "completed_batches": {},
   "partial_metrics": {},
-  "timestamp": "2026-07-31T05:02:49.154294+00:00",
+  "timestamp": "2026-10-17T19:49:12.823749+00:00",
   "payload": {
     "e5": {
-      "dqi_mean": 0.8587667650583664,
-      "dqi_median": 0.8587667650583664,
+      "dqi_mean": 0.9526840182298941,
+      "dqi_median": 0.9526840182298941,
       "pareto_size_mean": 3.0,
       "dqi_count": 220
     }

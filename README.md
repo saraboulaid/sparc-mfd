@@ -103,6 +103,35 @@ python run_experiment.py --dataset metr-la --resume
 python run_experiment.py --benchmark-e1 --dataset metr-la --quick
 ```
 
+### Routing graph and OTS horizon
+
+Two options dominate both the realism and the cost of a run:
+
+```bash
+# Sparse road graph (mean out-degree 7.3) with measured road distances, 3-step horizon.
+# These are now the defaults; `python` is ~3x faster than the `scipy` backend here.
+python run_experiment.py --dataset metr-la --routing-topology adj_real \
+    --ots-horizon 3 --routing-backend python
+
+# 15-minute analysis steps instead of hourly, for a sensitivity study
+python run_experiment.py --dataset metr-la --steps-per-hour 3 --ots-horizon 3
+```
+
+| Topology | Arcs (METR-LA) | Mean out-degree | Edge lengths | Reachable OD pairs | s / OD pair |
+|---|---|---|---|---|---|
+| `adj_real` *(default)* | 1,515 | 7.3 | measured, median 2,758 m | 93.8 % | 0.25 |
+| `csv_direct` | 11,546 | 55.8 | measured, median 7,433 m | 99.5 % | 2.48 |
+| `adj_mx` | 1,515 | 7.3 | proxy `500/aᵢⱼ` | 93.8 % | — |
+| `legacy_dense` | 42,642 | 206.0 | completed to 12 km | 100 % | — |
+
+`--steps-per-hour` sets how many raw 5-minute steps form one analysis step, so it also sets
+what `--ots-horizon` counts. With `--ots-horizon 1` the OTS volatility component is
+identically zero and persistence is binary; E0 now prints a degeneracy flag per component.
+
+A sparse graph is not strongly connected, so OD sampling rejects pairs with no directed path
+and records the rejection count in `results.json` under `E3_routing.od_sampling`. Cached OD
+pairs are tagged with the topology they were drawn on and resampled if it changes.
+
 E3 processes OD pairs in batches and checkpoints after every batch, so an interrupted run
 resumes without recomputation and without double counting.
 
@@ -159,32 +188,46 @@ Source: [`outputs/metr-la/full/results.json`](outputs/metr-la/full/results.json)
 
 ## Known limitations
 
-Reported honestly, because several of these bound the conclusions:
+Reported honestly, because several of these bound the conclusions. The results table above
+comes from the archived run, which predates the corrections marked **fixed in code**; those
+numbers will change when the run is repeated.
 
-1. **Degenerate target.** The archived runs use horizon `h=1`, so the volatility component is
+1. **Degenerate target.** The archived run uses horizon `h=1`, so the volatility component is
    identically zero and persistence is binary. Only the shock component varies continuously.
+   *Fixed in code:* `--ots-horizon` now defaults to 3 and E0 reports a per-component
+   degeneracy flag. The archived results have not yet been regenerated.
 2. **Weak node-level forecasting.** The encoder tracks the network-mean OTS trajectory but not
    per-node structure; residuals show systematic under-prediction of high-stress cells.
-3. **Routing topology is not road-faithful.** The selected `csv_direct` topology has mean
-   out-degree 206 of a possible 206 — effectively a complete detector graph. The sparse road
-   topology (`adj_mx`, mean out-degree 7.3) was rejected by the regression test because it
-   disagrees with the legacy dense router. This deflates RII magnitudes and compresses
-   differences between methods. **Most important correction to make.**
+3. **Routing topology is not road-faithful.** The archived run used `legacy_dense`, mean
+   out-degree 206 of a possible 206 — effectively a complete detector graph, in which many OD
+   pairs are a single arc. This deflates RII magnitudes and plausibly explains limitation 4.
+   *Fixed in code:* `adj_real` keeps the adjacency support with measured road distances
+   (out-degree 7.3) and is the new default. The archived results have not yet been regenerated.
 4. **MFD gating is not shown to help.** `sparc_ots`, `ots_instant`, `ots_cvar_fixed` and
    `oracle` sit within 0.5 % of each other. The evidence supports "using the stress field
-   helps a lot"; it does not support "MFD gating or CVaR tails add measurable value".
+   helps a lot"; it does not support "MFD gating or CVaR tails add measurable value". Whether
+   this survives the topology fix is an open question, not a settled result.
 5. **Statistics.** E3 means/medians use the first 5,000 of 21,000 observations per method, and
    those are consecutive rather than random. No paired significance test is run
    (`metrics.wilcoxon_paired` exists but is never called, and per-pair samples are not persisted).
 6. **Single run, single seed** (42), one detector mask per sparsity level.
-7. **PEMS-BAY results are legacy.** `outputs/pems-bay/results.json` carries no
-   `data_provenance` block and its regime fractions match a synthetic-era run; treat as
-   provisional. The real archive is now validated and the `full` run is pending.
+7. **No verified PEMS-BAY run.** `outputs/pems-bay/results.json` carries no `data_provenance`
+   block and its regime fractions match a synthetic-era run, so those numbers are withheld
+   rather than reported. The real archive is validated (`ok_for_full() is True`) and the run
+   is pending.
 8. **Ablations not executed.** `sparc_no_gkf` and `sparc_no_mgac` are defined in
    `routing.py` but absent from the archived runs, so per-component contributions are unknown.
-9. **E5 Pareto statistics are not measured.** Mean Pareto size (3.0) is a constant written by
-   the aggregation code, and the reported DQI median equals the mean by construction.
-10. **No real-time claim.** 88.5 h of single-machine CPU time for E3.
+9. **E5 Pareto statistics are not measured.** The E3 worker builds a single SPARC-OTS
+   candidate per OD pair, so Pareto filtering is trivial and the mean size of 3.0 is a
+   constant written by the aggregation code. The reported DQI median equals the mean because
+   the accumulator keeps only a running sum and count.
+10. **No real-time claim.** 88.5 h of single-machine CPU time for E3 on the dense graph.
+    *Measured after the fix:* 0.25 s per OD pair on `adj_real` with the `python` backend,
+    roughly 1.4 h for the same grid — still not real time.
+11. **Uncertainty is now quantified, not asserted.** E0 reports PICP, interval width, Winkler
+    interval score and Gaussian NLL at four nominal levels. A first `--quick` run gives
+    PICP 87.9 % at a nominal 90 %, i.e. slightly over-confident intervals. The `full`
+    calibration numbers are pending.
 
 ---
 
@@ -196,6 +239,10 @@ pytest tests/ -v
 
 - `test_kriging_equivalence.py` — cached solver vs. reference `Γ⁻¹` implementation
 - `test_dataset_validation.py` — provenance guards and synthetic-fallback detection
+- `test_topology.py` — `adj_real` sparsity and metric realism, connectivity report,
+  reachability-filtered OD sampling
+- `test_ots_horizon_and_calibration.py` — horizon degeneracy at `h=1`, recovery at `h=3`,
+  and calibration metrics against a well-specified Gaussian
 
 ---
 

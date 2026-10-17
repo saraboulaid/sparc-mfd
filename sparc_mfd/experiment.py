@@ -35,10 +35,11 @@ from .features import (
     build_temporal_features,
     normalize_train_only,
     sliding_windows,
+    step_frequency,
 )
 from .gkf_fusion import GKFFusion, fuse_numpy
 from .graph import build_distance_matrix, load_adjacency
-from .metrics import mae, regret, rmse, summarize_routing_results
+from .metrics import calibration_report, mae, regret, rmse, summarize_routing_results
 from .mgac import fit_mgac_params, mfd_embedding
 from .mfd_regime import MFDConfig, MFDRegime, regime_time_series
 from .ots_encoder import OTSSTEncoder, compute_ots_components, compute_ots_scalar, fit_ots_stats, ots_loss
@@ -65,6 +66,12 @@ class ExperimentConfig:
     n_od_pairs: int = 1000
     od_batch_size: int = 50
     seq_len: int = 12
+    #: Raw 5-minute steps averaged into one analysis step (12 = hourly, 3 = 15 min).
+    steps_per_hour: int = 12
+    #: Future steps entering the OTS volatility and persistence terms. With
+    #: ots_horizon=1 the volatility term is identically zero by construction.
+    ots_horizon: int = 3
+    ots_lookback: int = 3
     epochs: int = 10
     hidden_dim: int = 64
     batch_size: int = 32
@@ -284,12 +291,12 @@ def resolve_routing_topology(cfg: ExperimentConfig, data: Dict) -> RoutingTopolo
         report_path = Path("outputs/routing_regression_report.json")
         if report_path.exists():
             with open(report_path, encoding="utf-8") as f:
-                source = json.load(f).get("selected_topology", "csv_direct")
+                source = json.load(f).get("selected_topology", "adj_real")
         else:
-            source = "csv_direct"
+            source = "adj_real"
     topologies = data["routing_topologies"]
     if source not in topologies:
-        source = "csv_direct"
+        source = "adj_real"
     topo = topologies[source]
     print(f"  [E3] Routing topology: {topo.source} (mean degree {topo.mean_degree():.1f})")
     return topo
@@ -322,18 +329,38 @@ def _prepare_data(cfg: ExperimentConfig):
     routing_topologies = {
         "csv_direct": RoutingTopology.from_direct_distances(dist_direct, source="csv_direct"),
         "adj_mx": RoutingTopology.from_adjacency(adj, source="adj_mx"),
+        "adj_real": RoutingTopology.from_adjacency_distances(adj, dist_direct, source="adj_real"),
         "legacy_dense": RoutingTopology.from_dense_distances(dist, source="legacy_dense"),
     }
 
-    speed_h = aggregate_hourly(speed)
+    speed_h = aggregate_hourly(speed, cfg.steps_per_hour)
     train_end = int(len(speed_h) * 0.7)
     q_thr = np.quantile(speed_h[:train_end], 0.20, axis=0)
-    comp = compute_ots_components(speed_h, q_thresholds=q_thr)
+    comp = compute_ots_components(
+        speed_h,
+        horizon=cfg.ots_horizon,
+        lookback=cfg.ots_lookback,
+        q_thresholds=q_thr,
+    )
     stats = fit_ots_stats(comp, train_end)
     stats["q_thresholds"] = q_thr
     ots_h = compute_ots_scalar(comp, stats)
+    ots_components_report = {
+        "horizon": int(cfg.ots_horizon),
+        "lookback": int(cfg.ots_lookback),
+        "steps_per_hour": int(cfg.steps_per_hour),
+        "step_minutes": 5 * int(cfg.steps_per_hour),
+        **{
+            f"{key}_std_train": float(stats[f"{key}_std"])
+            for key in ("V", "D", "P")
+        },
+        **{
+            f"{key}_degenerate": bool(stats[f"{key}_std"] <= 1e-5)
+            for key in ("V", "D", "P")
+        },
+    }
 
-    x_trend = build_temporal_features(speed_h)
+    x_trend = build_temporal_features(speed_h, freq=step_frequency(cfg.steps_per_hour))
     _, vol_feat = build_dual_branch_features(speed_h)
     x_trend_n, _, _ = normalize_train_only(x_trend)
     x_all, y_all = sliding_windows(x_trend_n, ots_h, cfg.seq_len)
@@ -368,6 +395,7 @@ def _prepare_data(cfg: ExperimentConfig):
         "aux_test": aux_all[val_split:],
         "test_offset": val_split + cfg.seq_len,
         "data_provenance": data_report.to_provenance(),
+        "ots_components": ots_components_report,
     }
 
 
@@ -637,8 +665,19 @@ def run_dataset(cfg: ExperimentConfig) -> Dict:
             model, data["x_test"], data["x_vol_test"],
             data["edge_index"], data["edge_weight"], cfg.device,
         )
-        e0 = {"mae": float(mae(data["y_test"], mu)), "rmse": float(rmse(data["y_test"], mu))}
+        e0 = {
+            "mae": float(mae(data["y_test"], mu)),
+            "rmse": float(rmse(data["y_test"], mu)),
+            "calibration": calibration_report(data["y_test"], mu, sigma),
+            "ots_components": data["ots_components"],
+        }
+        cal = e0["calibration"]
+        picp90 = next(lv["picp"] for lv in cal["levels"] if lv["nominal"] == 0.90)
         print(f"  [E0] OTS MAE={e0['mae']:.4f} RMSE={e0['rmse']:.4f}")
+        print(
+            f"  [E0] Calibration: PICP@90%={100 * picp90:.1f}% "
+            f"(nominal 90%), ACE={100 * cal['ace']:.1f} pts, NLL={cal['nll']:.4f}"
+        )
         if cfg.routing_checkpoint:
             ckpt.save_e0_artifacts(model, mu, sigma, emb, e0)
         if profiler:
@@ -697,10 +736,28 @@ def run_dataset(cfg: ExperimentConfig) -> Dict:
     ]
     gkf_model = GKFFusion(emb.shape[-1])
     method_names = [m.value for m in methods]
-    od_pairs = ckpt.load_od_pairs()
+    topology = resolve_routing_topology(cfg, data)
+    connectivity = topology.connectivity_report()
+    print(
+        f"  [E3] Topology {connectivity['source']}: {connectivity['n_edges']} edges, "
+        f"{connectivity['isolated_nodes']} isolated nodes, "
+        f"{100 * connectivity['reachable_od_fraction']:.1f}% of OD pairs reachable"
+    )
+    od_pairs = ckpt.load_od_pairs(topology=topology.source)
+    od_sampling = ckpt.load_od_pairs_meta()
     if od_pairs is None:
-        od_pairs = sample_od_pairs(data["dist"], cfg.n_od_pairs, seed=cfg.seed)
-        ckpt.save_od_pairs(od_pairs)
+        od_sampling = {}
+        od_pairs = sample_od_pairs(
+            data["dist"], cfg.n_od_pairs, seed=cfg.seed,
+            topology=topology, stats=od_sampling,
+        )
+        od_sampling["topology"] = topology.source
+        ckpt.save_od_pairs(od_pairs, meta=od_sampling)
+        if od_sampling.get("rejected_unreachable"):
+            print(
+                f"  [E3] Rejected {od_sampling['rejected_unreachable']} unreachable OD draws "
+                f"on {topology.source}"
+            )
     test_idx = timesteps
 
     if ckpt.is_done("E3"):
@@ -716,7 +773,6 @@ def run_dataset(cfg: ExperimentConfig) -> Dict:
             )
         else:
             accumulator, start_batch, start_timestep = RoutingAccumulator.init(method_names), 0, 0
-        topology = resolve_routing_topology(cfg, data)
         accumulator = _run_routing_e3(
             cfg, data, mu, sigma, emb, speed_test, regimes, acc_arr, v_avg, offset,
             rcfg, gkf_model, methods, od_pairs, test_idx, accumulator, ckpt, profiler,
@@ -741,6 +797,8 @@ def run_dataset(cfg: ExperimentConfig) -> Dict:
         "n_od_pairs": cfg.n_od_pairs,
         "od_batch_size": cfg.od_batch_size,
         "batches_total": int(np.ceil(min(cfg.n_od_pairs, len(od_pairs)) / max(cfg.od_batch_size, 1))),
+        "topology": connectivity,
+        "od_sampling": od_sampling,
     }
 
     # --- E4 ---
@@ -843,6 +901,9 @@ def run_all(cfg_base: ExperimentConfig) -> Dict:
             routing_backend=cfg_base.routing_backend,
             routing_topology=cfg_base.routing_topology,
             od_workers=cfg_base.od_workers,
+            steps_per_hour=cfg_base.steps_per_hour,
+            ots_horizon=cfg_base.ots_horizon,
+            ots_lookback=cfg_base.ots_lookback,
         )
         all_results[ds] = run_dataset(cfg)
     summary_path = Path("outputs")
