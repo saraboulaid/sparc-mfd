@@ -47,7 +47,9 @@ from .routing import (
     RoutingConfig,
     RoutingMethod,
     RoutingTopology,
+    build_cost_csr,
     build_routing_graph,
+    precompute_node_cvar,
     sample_od_pairs,
 )
 from .routing_worker import init_worker as _init_od_worker, route_od_pair as _route_od_pair_worker
@@ -585,6 +587,24 @@ def _run_routing_e3(
             }
             hist = data["ots_h"][max(0, offset + t_i - 12) : offset + t_i + 1]
             hist_slice = hist[-12:] if len(hist) > 0 else None
+            node_cvar = precompute_node_cvar(hist_slice, rcfg.cvar_alpha)
+            # Cost matrices depend on (timestep, method, graph), never on the OD
+            # pair. Building them once per step is what makes the scipy backend
+            # cheaper than one quantile call per arc per pair.
+            cost_csrs = {}
+            if backend == "scipy":
+                graph_for = {
+                    RoutingMethod.ORACLE: graphs["oracle"],
+                    RoutingMethod.OTS_INSTANT: graphs["instant"],
+                }
+                try:
+                    for method in methods:
+                        g = graph_for.get(method, graphs["sparse"])
+                        cost_csrs[method.value] = build_cost_csr(
+                            g, topology, method, regime, rcfg, hist_slice, mfd_st, node_cvar
+                        )
+                except ImportError:
+                    cost_csrs = {}
 
             task_base = {
                 "graphs": graphs,
@@ -595,6 +615,8 @@ def _run_routing_e3(
                 "mfd_st": mfd_st,
                 "topology": topology,
                 "backend": backend,
+                "node_cvar": node_cvar,
+                "cost_csrs": cost_csrs,
             }
 
             _run_od_batch(od_batch, task_base, accumulator, od_workers)

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 from typing import Dict, List, Optional, Tuple
 
@@ -41,6 +41,20 @@ class RoutingTopology:
     neighbors: List[List[Tuple[int, float]]]
     n_nodes: int
     source: str
+    _dist_lookup: Optional[Dict[Tuple[int, int], float]] = field(
+        default=None, repr=False, compare=False
+    )
+
+    def distance_lookup(self) -> Dict[Tuple[int, int], float]:
+        """Arc length by (u, v), built once per topology instead of per query."""
+        if self._dist_lookup is None:
+            lookup = {
+                (u, v): d
+                for u, nbrs in enumerate(self.neighbors)
+                for v, d in nbrs
+            }
+            object.__setattr__(self, "_dist_lookup", lookup)
+        return self._dist_lookup  # type: ignore[return-value]
 
     @classmethod
     def from_direct_distances(cls, dist_direct: np.ndarray, source: str = "csv_direct") -> "RoutingTopology":
@@ -159,6 +173,27 @@ def cvar_upper(values: np.ndarray, alpha: float = 0.9) -> float:
     return float(np.mean(tail)) if len(tail) else float(q)
 
 
+def precompute_node_cvar(ots_history: Optional[np.ndarray], alpha: float = 0.9) -> Optional[np.ndarray]:
+    """Upper CVaR of the stress history at every node.
+
+    The tail penalty in Eq. (MGAC) depends only on the arriving node, yet
+    :func:`edge_cost` used to recompute it on every arc relaxation, which made
+    one quantile call per arc per method per OD pair. Hoisting it here turns
+    that into one call per node per timestep, reused across methods and across
+    every OD pair of the batch. Values are bit-identical to the per-arc path
+    because the same :func:`cvar_upper` is applied to the same column.
+    """
+    if ots_history is None:
+        return None
+    hist = np.asarray(ots_history)
+    if hist.ndim != 2 or hist.shape[0] == 0:
+        return None
+    return np.array(
+        [cvar_upper(hist[:, v], alpha) for v in range(hist.shape[1])],
+        dtype=np.float64,
+    )
+
+
 def edge_cost(
     dist_m: float,
     speed_kmh: float,
@@ -169,10 +204,12 @@ def edge_cost(
     regime: MFDRegime = MFDRegime.FREE_FLOW,
     cfg: Optional[RoutingConfig] = None,
     mfd_state: Optional[np.ndarray] = None,
+    cvar: Optional[float] = None,
 ) -> float:
     cfg = cfg or RoutingConfig()
     tau = travel_time_hours(dist_m, speed_kmh, cfg.min_speed_kmh)
-    cvar = cvar_upper(ots_samples, cfg.cvar_alpha) if ots_samples is not None else mu_ots * 1.1
+    if cvar is None:
+        cvar = cvar_upper(ots_samples, cfg.cvar_alpha) if ots_samples is not None else mu_ots * 1.1
 
     if method == RoutingMethod.TIME_ONLY:
         return tau
@@ -214,10 +251,7 @@ def _metrics_from_predecessors(
     cfg: RoutingConfig,
     return_path: bool,
 ) -> Tuple[List[int], float, Dict[str, float]]:
-    dist_lookup: Dict[Tuple[int, int], float] = {}
-    for u, nbrs in enumerate(topology.neighbors):
-        for v, d in nbrs:
-            dist_lookup[(u, v)] = d
+    dist_lookup = topology.distance_lookup()
 
     speed = graph["speed"]
     mu_ots = graph["mu_ots"]
@@ -274,6 +308,7 @@ def build_cost_csr(
     cfg: RoutingConfig,
     ots_history: Optional[np.ndarray],
     mfd_state: Optional[np.ndarray],
+    node_cvar: Optional[np.ndarray] = None,
 ):
     from scipy.sparse import csr_matrix
 
@@ -281,19 +316,21 @@ def build_cost_csr(
     speed = graph["speed"]
     mu_ots = graph["mu_ots"]
     sigma_ots = graph["sigma_ots"]
+    if node_cvar is None:
+        node_cvar = precompute_node_cvar(ots_history, cfg.cvar_alpha)
     for u, nbrs in enumerate(topology.neighbors):
         for v, dist_m in nbrs:
-            samples = ots_history[:, v] if ots_history is not None else None
             c = edge_cost(
                 dist_m,
                 float(speed[v]),
                 float(mu_ots[v]),
                 float(sigma_ots[v]),
-                samples,
+                None,
                 method,
                 regime,
                 cfg,
                 mfd_state,
+                cvar=float(node_cvar[v]) if node_cvar is not None else None,
             )
             rows.append(u)
             cols.append(v)
@@ -331,11 +368,14 @@ def dijkstra_sparse(
     ots_history: Optional[np.ndarray] = None,
     mfd_state: Optional[np.ndarray] = None,
     return_path: bool = True,
+    node_cvar: Optional[np.ndarray] = None,
 ) -> Tuple[List[int], float, Dict[str, float]]:
     cfg = cfg or RoutingConfig()
     speed = graph["speed"]
     mu_ots = graph["mu_ots"]
     sigma_ots = graph["sigma_ots"]
+    if node_cvar is None:
+        node_cvar = precompute_node_cvar(ots_history, cfg.cvar_alpha)
 
     pq = [(0.0, origin)]
     best = {origin: 0.0}
@@ -348,17 +388,17 @@ def dijkstra_sparse(
         if u == destination:
             break
         for v, dist_m in topology.neighbors[u]:
-            samples = ots_history[:, v] if ots_history is not None else None
             c = edge_cost(
                 dist_m,
                 float(speed[v]),
                 float(mu_ots[v]),
                 float(sigma_ots[v]),
-                samples,
+                None,
                 method,
                 regime,
                 cfg,
                 mfd_state,
+                cvar=float(node_cvar[v]) if node_cvar is not None else None,
             )
             nc = cost + c
             if nc < best.get(v, np.inf):
@@ -389,11 +429,15 @@ def dijkstra_scipy(
     ots_history: Optional[np.ndarray] = None,
     mfd_state: Optional[np.ndarray] = None,
     return_path: bool = True,
+    node_cvar: Optional[np.ndarray] = None,
+    cost_csr=None,
 ) -> Tuple[List[int], float, Dict[str, float]]:
     from scipy.sparse.csgraph import dijkstra as sp_dijkstra
 
     cfg = cfg or RoutingConfig()
-    w = build_cost_csr(graph, topology, method, regime, cfg, ots_history, mfd_state)
+    w = cost_csr if cost_csr is not None else build_cost_csr(
+        graph, topology, method, regime, cfg, ots_history, mfd_state, node_cvar=node_cvar
+    )
     dist_matrix, predecessors = sp_dijkstra(
         w, directed=True, indices=origin, return_predecessors=True, min_only=False
     )
@@ -420,6 +464,8 @@ def dijkstra(
     return_path: bool = True,
     topology: Optional[RoutingTopology] = None,
     backend: str = "scipy",
+    node_cvar: Optional[np.ndarray] = None,
+    cost_csr=None,
 ) -> Tuple[List[int], float, Dict[str, float]]:
     """Route with optional sparse topology and scipy/python backend."""
     if backend == "legacy" or topology is None:
@@ -429,12 +475,14 @@ def dijkstra(
     if backend == "scipy":
         try:
             return dijkstra_scipy(
-                graph, topology, origin, destination, method, regime, cfg, ots_history, mfd_state, return_path
+                graph, topology, origin, destination, method, regime, cfg, ots_history, mfd_state,
+                return_path, node_cvar=node_cvar, cost_csr=cost_csr,
             )
         except ImportError:
             pass
     return dijkstra_sparse(
-        graph, topology, origin, destination, method, regime, cfg, ots_history, mfd_state, return_path
+        graph, topology, origin, destination, method, regime, cfg, ots_history, mfd_state,
+        return_path, node_cvar=node_cvar,
     )
 
 

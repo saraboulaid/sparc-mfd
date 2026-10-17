@@ -109,18 +109,19 @@ Two options dominate both the realism and the cost of a run:
 
 ```bash
 # Sparse road graph (mean out-degree 7.3) with measured road distances, 3-step horizon.
-# These are now the defaults; `python` is ~3x faster than the `scipy` backend here.
+# These are now the defaults. The scipy backend is the fast path once cost matrices
+# are built once per timestep (CVaR is also precomputed per node, not per arc).
 python run_experiment.py --dataset metr-la --routing-topology adj_real \
-    --ots-horizon 3 --routing-backend python
+    --ots-horizon 3 --routing-backend scipy
 
 # 15-minute analysis steps instead of hourly, for a sensitivity study
 python run_experiment.py --dataset metr-la --steps-per-hour 3 --ots-horizon 3
 ```
 
-| Topology | Arcs (METR-LA) | Mean out-degree | Edge lengths | Reachable OD pairs | s / OD pair |
+| Topology | Arcs (METR-LA) | Mean out-degree | Edge lengths | Reachable OD pairs | s / OD pair (scipy + CSR cache) |
 |---|---|---|---|---|---|
-| `adj_real` *(default)* | 1,515 | 7.3 | measured, median 2,758 m | 93.8 % | 0.25 |
-| `csv_direct` | 11,546 | 55.8 | measured, median 7,433 m | 99.5 % | 2.48 |
+| `adj_real` *(default)* | 1,515 | 7.3 | measured, median 2,758 m | 93.8 % | 0.0016 |
+| `csv_direct` | 11,546 | 55.8 | measured, median 7,433 m | 99.5 % | — |
 | `adj_mx` | 1,515 | 7.3 | proxy `500/aᵢⱼ` | 93.8 % | — |
 | `legacy_dense` | 42,642 | 206.0 | completed to 12 km | 100 % | — |
 
@@ -222,8 +223,11 @@ numbers will change when the run is repeated.
    constant written by the aggregation code. The reported DQI median equals the mean because
    the accumulator keeps only a running sum and count.
 10. **No real-time claim.** 88.5 h of single-machine CPU time for E3 on the dense graph.
-    *Measured after the fix:* 0.25 s per OD pair on `adj_real` with the `python` backend,
-    roughly 1.4 h for the same grid — still not real time.
+    After switching to `adj_real` and hoisting CVaR plus the cost CSR out of the OD loop,
+    an isolated `route_od_pair` costs 0.0016 s (scipy) / 0.018 s (python) on METR-LA.
+    That extrapolates to minutes, not hours, for the archived 21 000-instance grid, but
+    is still not a real-time claim: the encoder, kriging and assignment sit outside that
+    number, and a timed full run has not yet replaced the extrapolation.
 11. **Uncertainty is now quantified, not asserted.** E0 reports PICP, interval width, Winkler
     interval score and Gaussian NLL at four nominal levels. A first `--quick` run gives
     PICP 87.9 % at a nominal 90 %, i.e. slightly over-confident intervals. The `full`
@@ -243,6 +247,8 @@ pytest tests/ -v
   reachability-filtered OD sampling
 - `test_ots_horizon_and_calibration.py` — horizon degeneracy at `h=1`, recovery at `h=3`,
   and calibration metrics against a well-specified Gaussian
+- `test_cvar_cache.py` — per-node CVaR and cached cost CSR are bit-identical to the
+  per-arc recomputation they replace
 
 ---
 
